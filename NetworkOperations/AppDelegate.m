@@ -7,7 +7,7 @@
 //
 
 #import "AppDelegate.h"
-
+#import "NetworkOperations.h"
 #import "AFNetworkActivityIndicatorManager.h"
 
 @implementation AppDelegate
@@ -19,6 +19,20 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
     [NSURLCache setSharedURLCache:URLCache];
     
     [[AFNetworkActivityIndicatorManager sharedManager] setEnabled:YES];
+    
+//    [NetworkOperation operationWithPath:@"json_test.php?get=1" Paramerters:nil requestMethod:HTTPRequestMethodGET successBlock:^(id JSONResponse) {
+//        [NetworkOperation operationWithParamerters:@{@"key" : JSONResponse, @"Jazzar":@"{\"name\":\"John Smith\""} requestMethod:HTTPRequestMethodPOST successBlock:nil andFailureBlock:nil];
+//    } andFailureBlock:^(NSError *error) {
+//        
+//    }];
+    NSData *data = [NSJSONSerialization dataWithJSONObject:@{@"key": @"Jazzar"} options:0 error:nil];
+    NSString *json = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+    NSLog(@"JSON string: %@\n\n\nJSON data: %@", json, data);
+    [NetworkOperation operationWithParamerters:@{@"key": @"Jazzar"} requestMethod:HTTPRequestMethodPOST successBlock:nil andFailureBlock:nil];
+
+//    [NetworkOperation operationWithParamerters:nil requestMethod:HTTPRequestMethodPOST successBlock:^(id JSONResponse) {
+//        [NetworkOperation operationWithParamerters:@{@"key" : JSONResponse} requestMethod:HTTPRequestMethodPOST successBlock:nil andFailureBlock:nil];
+//    } andFailureBlock:nil];
     
     UIViewController *viewController = [[UITableViewController alloc] initWithStyle:UITableViewStylePlain];
     self.navigationController = [[UINavigationController alloc] initWithRootViewController:viewController];

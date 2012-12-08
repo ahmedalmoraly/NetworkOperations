@@ -16,7 +16,7 @@
 
 NSString * const kNetworkBaseURLString = @"http://beta.jawalk.ws/API/Show";
 
-static NSString * const kNetworkOperationsAPIBaseURLString = @"<# API Base URL #>";
+static NSString * const kNetworkOperationsAPIBaseURLString = @"http://imontada.net";
 
 
 @interface NetworkOperation ()
@@ -68,9 +68,20 @@ static NSString * const kNetworkOperationsAPIBaseURLString = @"<# API Base URL #
     return [self operationWithRequest:request progress:nil success:success failure:nil];
 }
 
++(AFHTTPRequestOperation *)operationWithPath:(NSString *)url Paramerters:(NSDictionary *)parameters requestMethod:(HTTPRequestMethod)requestMethod andSuccessBlock:(void (^)(id))success
+{
+    NSMutableURLRequest *request = [self requestWithMethod:requestMethod path:url andParameters:parameters];
+    return [self operationWithRequest:request progress:nil success:success failure:nil];
+}
+
 +(AFHTTPRequestOperation *)operationWithParamerters:(NSDictionary *)parameters requestMethod:(HTTPRequestMethod)requestMethod successBlock:(void (^)(id))success andFailureBlock:(void (^)(NSError *))failure {
     
     NSMutableURLRequest *request = [self requestWithMethod:requestMethod andParameters:parameters];
+    return [self operationWithRequest:request progress:nil success:success failure:failure];
+}
++(AFHTTPRequestOperation *)operationWithPath:(NSString *)url Paramerters:(NSDictionary *)parameters requestMethod:(HTTPRequestMethod)requestMethod successBlock:(void (^)(id))success andFailureBlock:(void (^)(NSError *))failure {
+    
+    NSMutableURLRequest *request = [self requestWithMethod:requestMethod path:url andParameters:parameters];
     return [self operationWithRequest:request progress:nil success:success failure:failure];
 }
 
@@ -125,11 +136,34 @@ static NSString * const kNetworkOperationsAPIBaseURLString = @"<# API Base URL #
     NSMutableURLRequest *request;
     switch (requestMethod) {
         case HTTPRequestMethodGET:
-            request = [[self sharedClient] requestWithMethod:@"GET" path:@"" parameters:parameters];
+            request = [[self sharedClient] requestWithMethod:@"GET" path:@"json_test.php?get=1" parameters:parameters];
+            //[self sharedClient].parameterEncoding = AFFormURLParameterEncoding;
             break;
             
         case HTTPRequestMethodPOST:
-            request = [[self sharedClient] requestWithMethod:@"POST" path:@"" parameters:parameters];
+
+            [self sharedClient].parameterEncoding = AFJSONParameterEncoding;
+            request = [[self sharedClient] requestWithMethod:@"POST" path:@"json_test.php" parameters:parameters];
+            break;
+        default:
+            request = nil;
+            break;
+    }
+    
+    return request;
+}
++(NSMutableURLRequest *)requestWithMethod:(HTTPRequestMethod)requestMethod path:(NSString *)url andParameters:(NSDictionary *)parameters {
+    NSMutableURLRequest *request;
+    switch (requestMethod) {
+        case HTTPRequestMethodGET:
+            request = [[self sharedClient] requestWithMethod:@"GET" path:url parameters:parameters];
+            //[self sharedClient].parameterEncoding = AFFormURLParameterEncoding;
+            break;
+            
+        case HTTPRequestMethodPOST:
+            [self sharedClient].parameterEncoding = AFJSONParameterEncoding;
+            request = [[self sharedClient] requestWithMethod:@"POST" path:url parameters:parameters];
+            //
             break;
         default:
             request = nil;
@@ -169,6 +203,7 @@ static NSString * const kNetworkOperationsAPIBaseURLString = @"<# API Base URL #
     } failure:^(AFHTTPRequestOperation *operation, NSError *error)
     {
         if (TURN_LOGGER_ON) NSLog(@"[NetworkOperations Downloading ERROR] %@\n", error);
+        if (TURN_LOGGER_ON) NSLog(@"[NetworkOperations Downloaded Response] %@\n", operation.responseString);
         if (failure) failure(error);
     }];
     
@@ -324,12 +359,12 @@ static NSString * const kNetworkOperationsAPIBaseURLString = @"<# API Base URL #
         // Accept HTTP Header; see http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.1
         [self setDefaultHeader:@"Accept" value:@"application/json"];
         [self setDefaultHeader:@"Accept" value:@"text/json"];
-        [self setDefaultHeader:@"Accept" value:@"text/*"];
+        [self setDefaultHeader:@"Accept" value:@"text/html"];
         
         [AFHTTPRequestOperation addAcceptableContentTypes:[NSSet setWithObjects:@"application/pdf", @"application/xml", @"audio/mp4a-latm", @"audio/mpeg", @"audio/mp3", @"video/x-m4v", @"video/mp4", nil]];
         
         [self registerHTTPOperationClass:[AFJSONRequestOperation class]];
-    
+        //self.parameterEncoding = AFJSONParameterEncoding;
         [[AFNetworkActivityIndicatorManager sharedManager] setEnabled:YES];
         
         NSURLCache *URLCache = [[NSURLCache alloc] initWithMemoryCapacity:4 * 1024 * 1024 diskCapacity:20 * 1024 * 1024 diskPath:nil];

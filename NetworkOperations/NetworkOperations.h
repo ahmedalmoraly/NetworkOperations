@@ -23,7 +23,7 @@
 
 #import "AFNetworking.h"
 
-#define TURN_LOGGER_ON NO
+#define TURN_LOGGER_ON YES
 
 /**
  Enum that holds the HTTP Request Methods
@@ -33,6 +33,7 @@ typedef enum  {
     HTTPRequestMethodGET,
     HTTPRequestMethodPOST
 } HTTPRequestMethod;
+
 
 @interface NetworkOperation : AFHTTPClient
 
@@ -50,7 +51,12 @@ typedef enum  {
 
 +(AFHTTPRequestOperation *) operationWithParamerters:(NSDictionary *)parameters
                                        requestMethod:(HTTPRequestMethod)requestMethod
-                                     andSuccessBlock:(void (^)(id response))success;
+                                     andSuccessBlock:(void (^)(id JSONResponse))success;
+
+
++(AFHTTPRequestOperation *) operationWithPath:(NSString *)url Paramerters:(NSDictionary *)parameters
+                                       requestMethod:(HTTPRequestMethod)requestMethod
+                                     andSuccessBlock:(void (^)(id JSONResponse))success;
 
 
 
@@ -67,7 +73,13 @@ typedef enum  {
 
 +(AFHTTPRequestOperation *) operationWithParamerters:(NSDictionary *)parameters
                                        requestMethod:(HTTPRequestMethod)requestMethod
-                                        successBlock:(void (^)(id response))success
+                                        successBlock:(void (^)(id JSONResponse))success
+                                     andFailureBlock:(void (^)(NSError *error))failure;
+
+
++(AFHTTPRequestOperation *) operationWithPath:(NSString *)url Paramerters:(NSDictionary *)parameters
+                                       requestMethod:(HTTPRequestMethod)requestMethod
+                                        successBlock:(void (^)(id JSONResponse))success
                                      andFailureBlock:(void (^)(NSError *error))failure;
 
 
@@ -88,7 +100,7 @@ typedef enum  {
 +(AFHTTPRequestOperation *) operationWithParamerters:(NSDictionary *)parameters
                                        requestMethod:(HTTPRequestMethod)requestMethod
                                        progressBlock:(void (^)(NSInteger bytesRead, NSInteger totalBytesRead, NSInteger totalBytesExpectedToRead))progress
-                                        successBlock:(void (^)(id response))success
+                                        successBlock:(void (^)(id JSONResponse))success
                                      andFailureBlock:(void (^)(NSError *error))failure;
 
 
@@ -109,7 +121,7 @@ typedef enum  {
 +(AFHTTPRequestOperation *) operationWithFullURL:(NSString *)url
                                       parameters:(NSDictionary *)parameters
                                    requestMethod:(HTTPRequestMethod)requestMethod
-                                    successBlock:(void (^)(id response))success
+                                    successBlock:(void (^)(id JSONResponse))success
                                  andFailureBlock:(void (^)(NSError *error))failure;
 
 
